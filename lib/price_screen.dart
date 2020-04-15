@@ -10,9 +10,8 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
 
   String seletectedCurrency = 'USD';
-  CoinData coinData = CoinData();
 
-  List<DropdownMenuItem> getDropdownItems(){
+  DropdownButton<String> androidDropdown(){
     List<DropdownMenuItem<String>> dropDownItems = [];
 
     for(String currency in currenciesList){
@@ -22,19 +21,34 @@ class _PriceScreenState extends State<PriceScreen> {
       );
       dropDownItems.add(newItem);
     }
-
-    return dropDownItems;
+    return DropdownButton<String>(
+        value:seletectedCurrency,
+        items: dropDownItems,
+        onChanged: (value){
+          setState(() {
+            seletectedCurrency = value;
+            print(seletectedCurrency);
+          });
+        },
+    );
   }
 
-  List<Widget> getPickerItems(){
-    List<Text> pickerItemList = [];
+  
 
+  CupertinoPicker iOSPicker(){
+    List<Text> pickerItemList = [];
     for(String currency in currenciesList){
       var newItem = Text(currency);
       pickerItemList.add(newItem);
     }
-
-    return pickerItemList;
+    return CupertinoPicker(
+      backgroundColor: Colors.lightBlue,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (selectedIndex){
+        print(selectedIndex);
+      },
+      children: pickerItemList,
+    );
   }
 
   @override
@@ -73,28 +87,9 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: CupertinoPicker(
-              backgroundColor: Colors.lightBlue,
-              itemExtent: 32.0,
-              onSelectedItemChanged: (selectedIndex){
-                print(selectedIndex);
-              },
-              children: getPickerItems(),
-            ),
-          ),
+            child: ),
         ],
       ),
     );
   }
 }
-
-//DropdownButton<String>(
-//value:seletectedCurrency,
-//items: getDropdownItems(),
-//onChanged: (value){
-//setState(() {
-//seletectedCurrency = value;
-//print(seletectedCurrency);
-//});
-//}
-//),
