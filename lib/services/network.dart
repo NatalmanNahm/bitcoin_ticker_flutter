@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class NetworkHelper{
   final String url;
-  NetworkHelper({this.url});
+  NetworkHelper(this.url);
 
   Future getBitcoinData() async{
     http.Response response = await http.get(url);
