@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'coin_data.dart';
+import 'services/openJson.dart';
 import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
@@ -10,7 +13,29 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
 
+  String convert;
   String seletectedCurrency = 'USD';
+  String _conversion = "";
+
+  _PriceScreenState(){
+    updateUI().then((value) => setState(() {
+      _conversion = value;
+    }));
+  }
+
+  Future<String> updateUI() async{
+    var convertBTC = await OpenJsonData().getBitcoinConvert();
+    String conversion;
+    setState(() {
+      if(convertBTC == null){
+        conversion = 'Unable to convert data.';
+      }
+      double rate = convertBTC['rate'];
+      double rateDouble = rate.roundToDouble();
+      conversion = '1 BTC = $rateDouble USD';
+    });
+    return conversion;
+  }
 
   DropdownButton<String> androidDropdown(){
     List<DropdownMenuItem<String>> dropDownItems = [];
@@ -71,7 +96,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  _conversion,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
