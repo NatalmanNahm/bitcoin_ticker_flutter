@@ -6,9 +6,9 @@ const apiK = '1D1CABFF-DA2C-4331-A314-50BE914421BB';
 
 class OpenJsonData {
 
-  Future <dynamic> getBitcoinConvert() async {
+  Future <dynamic> getBitcoinConvert(String currency) async {
     NetworkHelper networkHelper = NetworkHelper
-      ('https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=$apiK');
+      ('https://rest.coinapi.io/v1/exchangerate/BTC/$currency?apikey=$apiK');
 
     var convertedBitcoin = await networkHelper.getBitcoinData();
     return convertedBitcoin;

@@ -18,13 +18,14 @@ class _PriceScreenState extends State<PriceScreen> {
   String _conversion = "";
 
   _PriceScreenState(){
-    updateUI().then((value) => setState(() {
+    updateUI(seletectedCurrency).then((value) => setState(() {
       _conversion = value;
+      print(_conversion);
     }));
   }
 
-  Future<String> updateUI() async{
-    var convertBTC = await OpenJsonData().getBitcoinConvert();
+  Future<String> updateUI(String currency) async{
+    var convertBTC = await OpenJsonData().getBitcoinConvert(currency);
     String conversion;
     setState(() {
       if(convertBTC == null){
@@ -32,7 +33,7 @@ class _PriceScreenState extends State<PriceScreen> {
       }
       double rate = convertBTC['rate'];
       double rateDouble = rate.roundToDouble();
-      conversion = '1 BTC = $rateDouble USD';
+      conversion = '1 BTC = $rateDouble $currency';
     });
     return conversion;
   }
@@ -50,10 +51,12 @@ class _PriceScreenState extends State<PriceScreen> {
     return DropdownButton<String>(
         value:seletectedCurrency,
         items: dropDownItems,
-        onChanged: (value){
+        onChanged: (value) async {
+          String newConvert =  await updateUI(value);
           setState(() {
             seletectedCurrency = value;
             print(seletectedCurrency);
+            _conversion = newConvert;
           });
         },
     );
@@ -68,7 +71,7 @@ class _PriceScreenState extends State<PriceScreen> {
     return CupertinoPicker(
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
-      onSelectedItemChanged: (selectedIndex){
+      onSelectedItemChanged: (selectedIndex) async{
         print(selectedIndex);
       },
       children: pickerItemList,
