@@ -72,7 +72,11 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) async{
-        print(selectedIndex);
+        String newConvert = await updateUI(currenciesList[selectedIndex]);
+        setState(() {
+          _conversion = newConvert;
+        });
+
       },
       children: pickerItemList,
     );
@@ -114,10 +118,12 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: Platform.isIOS ? iOSPicker() : androidDropdown(),
+            child: iOSPicker(),
           ),
         ],
       ),
     );
   }
 }
+
+//Platform.isIOS ? iOSPicker() : androidDropdown()
