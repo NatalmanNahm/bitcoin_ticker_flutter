@@ -15,17 +15,27 @@ class _PriceScreenState extends State<PriceScreen> {
 
   String convert;
   String seletectedCurrency = 'USD';
-  String _conversion = "";
+  String _conversionBTC = "";
+  String _conversionETH = "";
+  String _conversionLTC = "";
 
   _PriceScreenState(){
-    updateUI(seletectedCurrency).then((value) => setState(() {
-      _conversion = value;
-      print(_conversion);
-    }));
+    List<String> conversionList = [];
+
+    for( String crypto in cryptoList){
+      updateUI(currency: seletectedCurrency, crypto: crypto).then((value) => setState(() {
+        conversionList.add(value);
+        print(_conversionBTC);
+      }));
+    }
+    _conversionBTC = conversionList[0];
+    _conversionETH = conversionList[1];
+    _conversionLTC = conversionList[2];
   }
 
-  Future<String> updateUI(String currency) async{
-    var convertBTC = await OpenJsonData().getBitcoinConvert(currency);
+  Future<String> updateUI({String currency, String crypto}) async{
+    var convertBTC = await OpenJsonData()
+        .getBitcoinConvert(currency: currency, crypto: crypto);
     String conversion;
     setState(() {
       if(convertBTC == null){
@@ -33,7 +43,7 @@ class _PriceScreenState extends State<PriceScreen> {
       }
       double rate = convertBTC['rate'];
       double rateDouble = rate.roundToDouble();
-      conversion = '1 BTC = $rateDouble $currency';
+      conversion = '1 $crypto = $rateDouble $currency';
     });
     return conversion;
   }
@@ -52,11 +62,11 @@ class _PriceScreenState extends State<PriceScreen> {
         value:seletectedCurrency,
         items: dropDownItems,
         onChanged: (value) async {
-          String newConvert =  await updateUI(value);
+          String newConvert =  await updateUI(currency: value);
           setState(() {
             seletectedCurrency = value;
             print(seletectedCurrency);
-            _conversion = newConvert;
+            _conversionBTC = newConvert;
           });
         },
     );
@@ -72,9 +82,9 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) async{
-        String newConvert = await updateUI(currenciesList[selectedIndex]);
+        String newConvert = await updateUI(currency:currenciesList[selectedIndex]);
         setState(() {
-          _conversion = newConvert;
+          _conversionBTC = newConvert;
         });
 
       },
@@ -103,7 +113,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  _conversion,
+                  _conversionBTC,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -118,7 +128,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: iOSPicker(),
+            child: Platform.isIOS ? iOSPicker() : androidDropdown(),
           ),
         ],
       ),
@@ -126,4 +136,3 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 }
 
-//Platform.isIOS ? iOSPicker() : androidDropdown()
