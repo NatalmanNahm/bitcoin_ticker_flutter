@@ -14,38 +14,39 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
 
   String convert;
+  List<String> conversionList = [];
   String seletectedCurrency = 'USD';
   String _conversionBTC = "";
   String _conversionETH = "";
   String _conversionLTC = "";
 
   _PriceScreenState(){
-    updateUI(currency: seletectedCurrency, crypto: cryptoList[0]).then((value) => setState(() {
-      _conversionBTC = value;
+    updateUI(currency: seletectedCurrency).then((value) => setState(() {
+      conversionList = value;
+      _conversionBTC = conversionList[0];
+      _conversionETH = conversionList[1];
+      _conversionLTC = conversionList[2];
     }));
 
-    updateUI(currency: seletectedCurrency, crypto: cryptoList[1]).then((value) => setState(() {
-      _conversionETH = value;
-    }));
-
-    updateUI(currency: seletectedCurrency, crypto: cryptoList[2]).then((value) => setState(() {
-      _conversionLTC = value;
-    }));
   }
 
-  Future<String> updateUI({String currency, String crypto}) async{
-    var convertBTC = await OpenJsonData()
-        .getBitcoinConvert(currency: currency, crypto: crypto);
-    String conversion;
-    setState(() {
-      if(convertBTC == null){
-        conversion = 'Unable to convert data.';
-      }
-      double rate = convertBTC['rate'];
-      double rateDouble = rate.roundToDouble();
-      conversion = '1 $crypto = $rateDouble $currency';
-    });
-    return conversion;
+  Future<List<String>> updateUI({String currency}) async{
+    List<String> conversionList = [];
+    for (String crypto in cryptoList){
+      var convertBTC = await OpenJsonData()
+          .getBitcoinConvert(currency: currency, crypto: crypto);
+      String conversion;
+      setState(() {
+        if(convertBTC == null){
+          conversion = 'Unable to convert data.';
+        }
+        double rate = convertBTC['rate'];
+        double rateDouble = rate.roundToDouble();
+        conversion = '1 $crypto = $rateDouble $currency';
+        conversionList.add(conversion);
+      });
+    }
+    return conversionList;
   }
 
   DropdownButton<String> androidDropdown(){
@@ -62,11 +63,13 @@ class _PriceScreenState extends State<PriceScreen> {
         value:seletectedCurrency,
         items: dropDownItems,
         onChanged: (value) async {
-          String newConvert =  await updateUI(currency: value);
+          List<String> newConvert =  await updateUI(currency: value);
           setState(() {
             seletectedCurrency = value;
             print(seletectedCurrency);
-            _conversionBTC = newConvert;
+            _conversionBTC = newConvert[0];
+            _conversionETH = newConvert[1];
+            _conversionLTC = newConvert[2];
           });
         },
     );
@@ -82,9 +85,12 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) async{
-        String newConvert = await updateUI(currency:currenciesList[selectedIndex]);
+        List<String> newConvert = await
+          updateUI(currency:currenciesList[selectedIndex]);
         setState(() {
-          _conversionBTC = newConvert;
+          _conversionBTC = newConvert[0];
+          _conversionETH = newConvert[1];
+          _conversionLTC = newConvert[2];
         });
 
       },
